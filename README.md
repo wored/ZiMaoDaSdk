@@ -88,6 +88,10 @@ $zimaoda = new ZiMaoDaSdk($config);
 ```php
 <?php
    $order['OWebOrderReFund'] = [
+       'attributes'=>[//OWebOrderReFund属性
+           'xsi:noNamespaceSchemaLocation'=>'orderrefund.xsd',
+           'xmlns:xsi'=>'http://www.w3.org/2001/XMLSchema-instance',
+       ],
        'orderNumber'    => '1020190418789450',//必选	订单号
        'orderStatus'      => 'B2C_REFUND_STATUES',//订单状态：B2C_REFUND_STATUES
    ];
