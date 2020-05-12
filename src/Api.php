@@ -22,9 +22,9 @@ class Api extends AbstractAPI
     {
         $this->config = $ziMaoDaSdk->getConfig();
         $this->params = [
-            'nick'   => $this->config['nick'],
-            'name'   => $this->config['name'],
-            'format' => $this->config['format'],
+            'nick'   => $this->config['nick'],//卖家店铺昵称
+            'name'   => $this->config['name'],//访问此接口所需要的帐号
+            'format' => $this->config['format'],//格式：xml
         ];
     }
 
@@ -37,8 +37,8 @@ class Api extends AbstractAPI
     {
         $http = $this->getHttp();
         $params = array_merge($this->params, $params);
-        $params['date'] = date('Y-m-d H:i:s', time());
-        $params['sign'] = $this->sign($params);
+        $params['date'] = date('Y-m-d H:i:s', time());//调用接口的时间
+        $params['sign'] = $this->sign($params);//请使用32位md5加密
         $requestUrl = $this->config['rootUrl'] . '/webAPI/' . $urlPath;
         $response = call_user_func_array([$http, 'POST'], [$requestUrl, $params]);
         return json_decode(strval($response->getBody()), true);
