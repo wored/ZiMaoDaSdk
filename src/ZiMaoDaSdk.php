@@ -31,10 +31,10 @@ class ZiMaoDaSdk extends Foundation
     public function createOrder(array $order)
     {
         $params = [
-            'method'      => 'swapi.web.order.create',
-            'orderDate'   => $order['OWebOrder']['orderDate'],
-            'orderNumber' => $order['OWebOrder']['orderNumber'],
-            'orderData'   => $this->api->paramToXml($order),
+            'method'      => 'swapi.web.order.create',//方法名称
+            'orderDate'   => $order['OWebOrder']['orderDate'],//订单推送时间
+            'orderNumber' => $order['OWebOrder']['orderNumber'],//订单编号
+            'orderData'   => $this->api->paramToXml($order),//xml请求数据
         ];
         return $this->api->request('createOrder', $params);
     }
@@ -48,9 +48,9 @@ class ZiMaoDaSdk extends Foundation
     public function refundOrder(array $order)
     {
         $params = [
-            'method'      => 'swapi.web.order.refund',
-            'orderNumber' => $order['OWebOrderReFund']['orderNumber'],
-            'orderData'   => $this->api->paramToXml($order),
+            'method'      => 'swapi.web.order.refund',//方法名称
+            'orderNumber' => $order['OWebOrderReFund']['orderNumber'],//订单编号
+            'orderData'   => $this->api->paramToXml($order),//xml请求数据
         ];
         return $this->api->request('refundOrder', $params);
     }
