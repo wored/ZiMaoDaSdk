@@ -1,0 +1,19 @@
+{
+    "name": "wored/zimaoda-sdk",
+    "description": "自贸达推送报关订单",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "qiliu",
+            "email": "qiliuf@gmail.com"
+        }
+    ],
+    "require": {
+        "hanson/foundation-sdk": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wored\\ZiMaoDaSdk\\": "src"
+        }
+    }
+}
