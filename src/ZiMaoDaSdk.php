@@ -8,7 +8,8 @@ use Hanson\Foundation\Foundation;
 /***
  * Class ZiMaoDaSdk
  * @package \Wored\ZiMaoDaSdk
- *
+ * 
+ * @property \Wored\ZiMaoDaSdk\Api $api
  */
 class ZiMaoDaSdk extends Foundation
 {
