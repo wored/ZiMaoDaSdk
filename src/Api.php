@@ -33,15 +33,23 @@ class Api extends AbstractAPI
      * @param array $params
      * @return mixed
      */
-    public function request(string $urlPath, array $params)
+    public function request(string $method, array $order)
     {
         $http = $this->getHttp();
-        $params = array_merge($this->params, $params);
-        $params['date'] = date('Y-m-d H:i:s', time());//调用接口的时间
-        $params['sign'] = $this->sign($params);//请使用32位md5加密
-        $requestUrl = $this->config['rootUrl'] . '/webAPI/' . $urlPath;
-        $response = call_user_func_array([$http, 'POST'], [$requestUrl, $params]);
-        return json_decode(strval($response->getBody()), true);
+        $params = [
+            'appkey'    => $this->config['appkey'],
+            'timestamp' => date('Y-m-d H:i:s'),
+            'method'    => $method,
+            'format'    => 'JSON',
+        ];
+        if (!empty($order['orderNumber'])) {
+            $params['orderNumber'] = $order['orderNumber'];
+        }
+        $body = json_encode($order);
+        $params['sign'] = $this->sign($params, $body);
+        $requestUrl = $this->config['rootUrl'] . '?' . http_build_query($params);
+        $response = $this->https_request($requestUrl,$body);
+        return json_decode($response, true);
     }
 
     /**
@@ -49,52 +57,37 @@ class Api extends AbstractAPI
      * @param array $request_params
      * @return string
      */
-    public function sign(array $params)
+    public function sign(array $params, string $body)
     {
-        $data = '';
-        $data .= base64_encode($params['nick']);
-        $data .= base64_encode($params['method']);
-        $data .= base64_encode($params['date']);
-        $data .= base64_encode($params['name']);
-        $data .= base64_encode($params['orderNumber']);
-        $data .= base64_encode($params['format']);
-        return md5($data);
+        $str = '';
+        ksort($params, SORT_STRING);
+        foreach ($params as $k => $v) {
+            $str .= $k . $v;
+        }
+        $str = $this->config['appsecret'] . $str . $body . $this->config['appsecret'];
+        return strtoupper(md5($str));
     }
 
     /**
-     * @param $param
-     * @param bool $root
-     * @return string
+     * http 请求
+     * @param $url 请求的链接url
+     * @param null $data 请求的参数，参数为空get请求，参数不为空post请求
+     * @return mixed
      */
-    public function paramToXml($param, $root = true)
+    public function https_request($url, $data = null)
     {
-        if ($root) {
-            $xml = '<?xml version="1.0" encoding="utf-8"?>';
-        } else {
-            $xml = '';
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type: application/json']);
+        if (!empty($data)) {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         }
-        foreach ($param as $key => $vo) {
-            if ($key === 'attributes') {//判断是否是属性字段
-                continue;
-            }
-            if (!is_numeric($key)) {
-                $xml .= "<{$key}";
-                if (!empty($vo['attributes'])) {//添加属性
-                    foreach ($vo['attributes'] as $item => $attribute) {
-                        $xml .= " {$item}=\"{$attribute}\"";
-                    }
-                }
-                $xml .= '>';
-            }
-            if (is_array($vo) and count($vo) > 0) {
-                $xml .= $this->paramToXml($vo, false);
-            } else {
-                $xml .= $vo;
-            }
-            if (!is_numeric($key)) {
-                $xml .= "</{$key}>";
-            }
-        }
-        return $xml;
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        return $output;
     }
 }

@@ -1,7 +1,6 @@
 {
     "name": "wored/zimaoda-sdk",
     "description": "自贸达推送报关订单",
-    "license": "MIT",
     "authors": [
         {
             "name": "qiliu",
@@ -13,7 +12,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Wored\\ZiMaoDaSdk\\": "src"
+            "wored\\ZiMaoDaSdk\\": "src"
         }
     }
 }

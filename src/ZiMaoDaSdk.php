@@ -8,7 +8,7 @@ use Hanson\Foundation\Foundation;
 /***
  * Class ZiMaoDaSdk
  * @package \Wored\ZiMaoDaSdk
- * 
+ *
  * @property \Wored\ZiMaoDaSdk\Api $api
  */
 class ZiMaoDaSdk extends Foundation
@@ -29,15 +29,20 @@ class ZiMaoDaSdk extends Foundation
      * @param array $order 以数组的信息拼装
      * @return mixed
      */
-    public function createOrder(array $order)
+    public function createOrUpdateOrder(string $type, array $order)
     {
-        $params = [
-            'method'      => 'swapi.web.order.create',//方法名称
-            'orderDate'   => $order['OWebOrder']['orderDate'],//订单推送时间
-            'orderNumber' => $order['OWebOrder']['orderNumber'],//订单编号
-            'orderData'   => $this->api->paramToXml($order),//xml请求数据
-        ];
-        return $this->api->request('createOrder', $params);
+        switch ($type) {
+            case 'create':
+                $method = 'webapi.order.create';
+                break;
+            case 'update':
+                $method = 'webapi.order.update';
+                break;
+            default:
+                return 'type类别不支持';
+                break;
+        }
+        return $this->api->request($method, $order);
     }
 
     /**
@@ -48,11 +53,11 @@ class ZiMaoDaSdk extends Foundation
      */
     public function refundOrder(array $order)
     {
-        $params = [
-            'method'      => 'swapi.web.order.refund',//方法名称
-            'orderNumber' => $order['OWebOrderReFund']['orderNumber'],//订单编号
-            'orderData'   => $this->api->paramToXml($order),//xml请求数据
-        ];
-        return $this->api->request('refundOrder', $params);
+        return $this->api->request('webapi.order.cancel', $order);
+    }
+
+    public function emsInfo(array $order)
+    {
+        return $this->api->request('webapi.order.emsInfo', $order);
     }
 }
