@@ -9,7 +9,6 @@ use Psr\Http\Message\ResponseInterface;
 class Api extends AbstractAPI
 {
     public $config;
-    public $params;
 
     /**
      * Api constructor.
@@ -21,11 +20,6 @@ class Api extends AbstractAPI
     public function __construct(ZiMaoDaSdk $ziMaoDaSdk)
     {
         $this->config = $ziMaoDaSdk->getConfig();
-        $this->params = [
-            'nick'   => $this->config['nick'],//卖家店铺昵称
-            'name'   => $this->config['name'],//访问此接口所需要的帐号
-            'format' => $this->config['format'],//格式：xml
-        ];
     }
 
     /**
@@ -35,7 +29,6 @@ class Api extends AbstractAPI
      */
     public function request(string $method, array $order)
     {
-        $http = $this->getHttp();
         $params = [
             'appkey'    => $this->config['appkey'],
             'timestamp' => date('Y-m-d H:i:s'),
@@ -48,7 +41,7 @@ class Api extends AbstractAPI
         $body = json_encode($order);
         $params['sign'] = $this->sign($params, $body);
         $requestUrl = $this->config['rootUrl'] . '?' . http_build_query($params);
-        $response = $this->https_request($requestUrl,$body);
+        $response = $this->https_request($requestUrl, $body);
         return json_decode($response, true);
     }
 
