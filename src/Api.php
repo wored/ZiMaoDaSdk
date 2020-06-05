@@ -4,6 +4,7 @@ namespace Wored\ZiMaoDaSdk;
 
 
 use Hanson\Foundation\AbstractAPI;
+use Hanson\Foundation\Log;
 use Psr\Http\Message\ResponseInterface;
 
 class Api extends AbstractAPI
@@ -41,7 +42,9 @@ class Api extends AbstractAPI
         $body = json_encode($order);
         $params['sign'] = $this->sign($params, $body);
         $requestUrl = $this->config['rootUrl'] . '?' . http_build_query($params);
+        Log::debug('Client Request:', compact('requestUrl','body'));
         $response = $this->https_request($requestUrl, $body);
+        Log::debug('API response:', compact('response'));
         return json_decode($response, true);
     }
 
