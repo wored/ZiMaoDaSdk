@@ -42,9 +42,7 @@ class Api extends AbstractAPI
         $body = json_encode($order);
         $params['sign'] = $this->sign($params, $body);
         $requestUrl = $this->config['rootUrl'] . '?' . http_build_query($params);
-        Log::debug('Client Request:', compact('requestUrl','body'));
-        $response = $this->https_request($requestUrl, $body);
-        Log::debug('API response:', compact('response'));
+        $response = $this->httpsRequest($requestUrl, $body);
         return json_decode($response, true);
     }
 
@@ -70,8 +68,9 @@ class Api extends AbstractAPI
      * @param null $data 请求的参数，参数为空get请求，参数不为空post请求
      * @return mixed
      */
-    public function https_request($url, $data = null)
+    public function httpsRequest($url, $data = null)
     {
+        Log::debug('Client Request:', compact('url','data'));
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -84,6 +83,7 @@ class Api extends AbstractAPI
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($curl);
         curl_close($curl);
+        Log::debug('API response:', compact('output'));
         return $output;
     }
 }
