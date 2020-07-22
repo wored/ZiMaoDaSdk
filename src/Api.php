@@ -4,8 +4,7 @@ namespace Wored\ZiMaoDaSdk;
 
 
 use Hanson\Foundation\AbstractAPI;
-use Hanson\Foundation\Log;
-use Psr\Http\Message\ResponseInterface;
+use Hanson\Foundation\Http;
 
 class Api extends AbstractAPI
 {
@@ -42,8 +41,9 @@ class Api extends AbstractAPI
         $body = json_encode($order);
         $params['sign'] = $this->sign($params, $body);
         $requestUrl = $this->config['rootUrl'] . '?' . http_build_query($params);
-        $response = $this->httpsRequest($requestUrl, $body);
-        return json_decode($response, true);
+        $http=new Http();
+        $response=$http->json($requestUrl,$order);
+        return json_decode(strval($response->getBody()), true);
     }
 
     /**
@@ -60,30 +60,5 @@ class Api extends AbstractAPI
         }
         $str = $this->config['appsecret'] . $str . $body . $this->config['appsecret'];
         return strtoupper(md5($str));
-    }
-
-    /**
-     * http 请求
-     * @param $url 请求的链接url
-     * @param null $data 请求的参数，参数为空get请求，参数不为空post请求
-     * @return mixed
-     */
-    public function httpsRequest($url, $data = null)
-    {
-        Log::debug('Client Request:', compact('url','data'));
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type: application/json']);
-        if (!empty($data)) {
-            curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        }
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $output = curl_exec($curl);
-        curl_close($curl);
-        Log::debug('API response:', compact('output'));
-        return $output;
     }
 }
